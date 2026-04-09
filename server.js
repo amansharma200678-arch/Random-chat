@@ -6,10 +6,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// ✅ STATIC FILE
 app.use(express.static(__dirname));
 
-server.listen(PORT, () => {
-  console.log("Server running...");
+// ✅ FORCE INDEX LOAD
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
 });
 
 let waitingUser = null;
@@ -21,7 +23,6 @@ io.on("connection", (socket) => {
       socket.partner = waitingUser;
       waitingUser.partner = socket;
 
-      // 🔥 ROLE FIX (IMPORTANT)
       socket.emit("matched", { role: "caller" });
       waitingUser.emit("matched", { role: "receiver" });
 
@@ -45,14 +46,12 @@ io.on("connection", (socket) => {
     matchUser();
   });
 
-  // 💬 CHAT
   socket.on("message", (msg) => {
     if (socket.partner) {
       socket.partner.emit("message", msg);
     }
   });
 
-  // 🎥 VIDEO SIGNALING
   socket.on("offer", (offer) => {
     if (socket.partner) {
       socket.partner.emit("offer", offer);
@@ -83,8 +82,10 @@ io.on("connection", (socket) => {
   });
 });
 
+// ✅ PORT PEHLE DEFINE
 const PORT = process.env.PORT || 5000;
 
+// ✅ SERVER START
 server.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
