@@ -8,6 +8,10 @@ const io = new Server(server);
 
 app.use(express.static(__dirname));
 
+server.listen(PORT, () => {
+  console.log("Server running...");
+});
+
 let waitingUser = null;
 
 io.on("connection", (socket) => {
@@ -83,7 +87,4 @@ const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
   console.log("Server running on port " + PORT);
-});
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
 });
